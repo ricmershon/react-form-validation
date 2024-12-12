@@ -3,19 +3,39 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+	}
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+	color: var(--foreground);
+	background: var(--background);
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-label {
+	@apply text-gray-700 text-base;
+}
+
+.form-input {
+	@apply mt-1 block w-full px-4 py-2 border rounded focus:outline-none focus:ring-2;
+}
+
+.form-input-border {
+	@apply border-gray-300 focus:ring-blue-500;
+}
+
+.form-input-border-error {
+	@apply border-red-500 focus:ring-red-500;
+}
+
+.form-input-error {
+	@apply text-red-500 text-sm mt-1;
 }

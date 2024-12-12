@@ -1,101 +1,190 @@
-import Image from "next/image";
+"use client";
+
+import { ChangeEvent, SyntheticEvent, useState } from "react";
+
+interface DataAndErrors {
+    name: string;
+    age: number | string;
+    email: string;
+    password: string;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    const [formData, setFormData] = useState<DataAndErrors>({
+        name: '',
+        age: 0,
+        email: '',
+        password: '',
+    });
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    const [errors, setErrors] = useState<DataAndErrors>({
+        name: '',
+        age: '',
+        email: '',
+        password: ''
+    });
+
+    const [submissionMessage, setSubmissionsMessage] = useState('');
+
+    const validate = (): DataAndErrors => {
+        const newErrors: DataAndErrors = {
+            name: '',
+            age: '',
+            email: '',
+            password: ''
+        };
+
+        if (!formData.name?.trim()) {
+            newErrors.name = 'Name is required';
+        }
+
+        if (formData.age as number < Number(18)) {
+            newErrors.age = "Must be at least 18 years of age"
+        }
+
+        if (!formData.email?.trim()) {
+            newErrors.email = "Email is required"
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Email is invalid';
+        }
+
+        if (!formData.password) {
+            newErrors.password = "Password is required"
+        } else if (formData.password.length < 6) {
+            newErrors.password = "Password must be at least 6 characters"
+        }
+
+        return newErrors;
+    }
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
+    }
+
+    const handleSubmit = (event: SyntheticEvent) => {
+        event.preventDefault();
+        
+        const validationErrors = validate();
+
+        if (
+            validationErrors.name ||
+            validationErrors.age ||
+            validationErrors.email ||
+            validationErrors.password
+            
+        ) {
+            setErrors(validationErrors);
+            setSubmissionsMessage("");
+        } else {
+            setErrors({
+                name: '',
+                age: '',
+                email: '',
+                password: ''
+            });
+            setSubmissionsMessage("Form submitted successfully.");
+            setFormData({
+                name: '',
+                age: '',
+                email: '',
+                password: ''
+            });
+        }
+    }
+
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 p6">
+            <form
+                onSubmit={(event) => handleSubmit(event)}
+                className="bg-white p-8 rounded shadow-md w-full max-w-md space-y-5"
+            >
+                <h1 className="text-2xl font-bold mb-6">Sign Up</h1>
+                <div>
+                    <label htmlFor="name" className="form-label">
+                        Name
+                    </label>
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className={`form-input ${
+                            errors.name
+                                ? "form-input-border-error"
+                                : "form-border-input"
+                        }`}
+                    />
+                    {errors.name && <p className="form-input-error">{errors.name}</p>}
+                </div>
+                <div>
+                    <label htmlFor="age" className="form-label">
+                        Age
+                    </label>
+                    <input
+                        type="number"
+                        name="age"
+                        id="age"
+                        value={formData.age}
+                        onChange={handleChange}
+                        className={`form-input ${
+                            errors.age
+                                ? "form-input-border-error"
+                                : "form-border-input"
+                        }`}
+                    />
+                    {errors.age && <p className="form-input-error">{errors.age}</p>}
+                </div>
+                <div>
+                    <label htmlFor="email" className="form-label">
+                        Email
+                    </label>
+                    <input
+                        type="text"
+                        name="email"
+                        id="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className={`form-input ${
+                            errors.email
+                                ? "form-input-border-error"
+                                : "form-border-input"
+                        }`}
+                    />
+                    {errors.email && <p className="form-input-error">{errors.email}</p>}
+                </div>
+                <div>
+                    <label htmlFor="password" className="form-label">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className={`form-input ${
+                            errors.name
+                                ? "form-input-border-error"
+                                : "form-border-input"
+                        }`}
+                    />
+                    {errors.password && <p className="form-input-error">{errors.password}</p>}
+                </div>
+
+                <button
+                    type="submit"
+                    className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                >
+                    Submit
+                </button>
+                {submissionMessage && 
+                    <p className="text-sm text-green-500">{submissionMessage}</p>
+                }
+            </form>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    )
 }
